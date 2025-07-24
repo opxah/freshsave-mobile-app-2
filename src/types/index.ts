@@ -34,6 +34,20 @@ export interface Product {
   storeId: string;
   createdAt: string;
   updatedAt: string;
+  // Yuka-style fields
+  score?: number;
+  rating?: string;
+  ingredients?: string[];
+  allergens?: string[];
+  nutritionalInfo?: {
+    calories: number;
+    fat: number;
+    saturatedFat: number;
+    carbohydrates: number;
+    sugar: number;
+    protein: number;
+    salt: number;
+  };
 }
 
 export interface FavoriteProduct {
