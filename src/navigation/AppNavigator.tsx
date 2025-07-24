@@ -36,14 +36,14 @@ const CustomerTabNavigator = () => (
         borderTopColor: '#e9ecef',
         paddingBottom: 0,
         paddingTop: 0,
-        height: 50,
+        height: 80,
         elevation: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -1 },
         shadowOpacity: 0.03,
         shadowRadius: 1,
         position: 'absolute',
-        bottom: '4%',
+        bottom: 0,
         left: 0,
         right: 0,
       },
@@ -58,11 +58,11 @@ const CustomerTabNavigator = () => (
       tabBarLabelStyle: {
         fontSize: 12,
         fontWeight: '500',
-        marginTop: 2,
+        marginTop: 4,
       },
       tabBarIconStyle: {
-        marginBottom: 2,
-        marginTop: 0,
+        marginBottom: 4,
+        marginTop: 8,
       },
     }}
   >
@@ -76,11 +76,11 @@ const CustomerTabNavigator = () => (
       }}
     />
     <Tab.Screen 
-      name="Map" 
+      name="Search" 
       component={SearchScreen}
       options={{
         tabBarIcon: ({ color, size }) => (
-          <MaterialIcons name="map" size={size} color={color} />
+          <MaterialIcons name="search" size={size} color={color} />
         ),
       }}
     />
