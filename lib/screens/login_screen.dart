@@ -268,9 +268,9 @@ class _LoginScreenState extends State<LoginScreen>
                     height: MediaQuery.of(context).size.height * 0.5,
                   ),
                   
-                  // Login card - Bottom 50%
+                  // Login card - Bottom 35% (leaving 15% empty)
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.35,
                     decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -279,7 +279,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Form(
                         key: _formKey,
                         child: Column(
@@ -290,7 +290,7 @@ class _LoginScreenState extends State<LoginScreen>
                               child: Text(
                                 "Let's get you signed in!",
                                 style: TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
@@ -298,7 +298,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 16),
                             
                             // Sign up prompt
                             Row(
@@ -327,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen>
                               ],
                             ),
                             
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
                             
                             // Email Field
                             TextFormField(
@@ -362,7 +362,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
-                                  vertical: 16,
+                                  vertical: 14,
                                 ),
                               ),
                               validator: (value) {
@@ -375,7 +375,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 return null;
                               },
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
 
                             // Password Field
                             TextFormField(
@@ -423,7 +423,7 @@ class _LoginScreenState extends State<LoginScreen>
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
-                                  vertical: 16,
+                                  vertical: 14,
                                 ),
                               ),
                               validator: (value) {
@@ -434,7 +434,7 @@ class _LoginScreenState extends State<LoginScreen>
                               },
                             ),
                             
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 8),
                             
                             // Forgot password
                             Align(
@@ -453,12 +453,12 @@ class _LoginScreenState extends State<LoginScreen>
                               ),
                             ),
                             
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 16),
 
                             // Sign In Button
                             SizedBox(
                               width: double.infinity,
-                              height: 56,
+                              height: 50,
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : _login,
                                 style: ElevatedButton.styleFrom(
