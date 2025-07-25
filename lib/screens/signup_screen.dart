@@ -143,9 +143,9 @@ class _SignUpScreenState extends State<SignUpScreen>
         bottom: false,
         child: Column(
           children: [
-            // Top section with signup form (50%)
+            // Top section with signup form (60% - increased to prevent overflow)
             Expanded(
-              flex: 5,
+              flex: 6,
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -159,7 +159,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                     // Dismiss keyboard when tapping outside form fields
                     FocusScope.of(context).unfocus();
                   },
-                  child: Padding(
+                  child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                     child: Form(
                       key: _formKey,
@@ -181,7 +181,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         
                         // Username Field
                         TextFormField(
@@ -402,7 +402,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         
                         // Create Account Button
                         SizedBox(
@@ -439,7 +439,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         
                         // Sign In link
                         Center(
@@ -466,7 +466,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 8), // Minimal bottom padding
+                        const SizedBox(height: 4), // Minimal bottom padding
                       ],
                     ),
                   ),
@@ -475,9 +475,9 @@ class _SignUpScreenState extends State<SignUpScreen>
               ),
             ),
             
-            // Bottom section with food animations (50%)
+            // Bottom section with food animations (40% - adjusted to balance with form)
             Expanded(
-              flex: 5,
+              flex: 4,
               child: Container(
                 decoration: const BoxDecoration(
                   color: Color(0xFF1A1A1A),
