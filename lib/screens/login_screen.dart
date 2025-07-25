@@ -13,8 +13,10 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _scrollController = ScrollController();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _isKeyboardVisible = false;
 
   // Animation controllers
   late AnimationController _character1Controller;
@@ -57,7 +59,35 @@ class _LoginScreenState extends State<LoginScreen>
     _circleController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _handleKeyboardVisibility(bool isVisible) {
+    setState(() {
+      _isKeyboardVisible = isVisible;
+    });
+  }
+
+  void _scrollToShowForm() {
+    // Set keyboard visible when form is tapped
+    _handleKeyboardVisibility(true);
+    
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (_scrollController.hasClients) {
+        final maxScroll = _scrollController.position.maxScrollExtent;
+        final currentScroll = _scrollController.position.pixels;
+        final targetScroll = maxScroll - 200; // Leave some space at bottom
+        
+        if (targetScroll > currentScroll) {
+          _scrollController.animateTo(
+            targetScroll,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeOut,
+          );
+        }
+      }
+    });
   }
 
   void _login() async {
@@ -82,20 +112,36 @@ class _LoginScreenState extends State<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Detect keyboard visibility
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardVisible = keyboardHeight > 0;
+    
+    // Update keyboard state if it changed
+    if (isKeyboardVisible != _isKeyboardVisible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleKeyboardVisibility(isKeyboardVisible);
+      });
+    }
+    
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
-                         // Top section with animated food items (50% of screen)
-             SizedBox(
-               height: MediaQuery.of(context).size.height * 0.5,
+                         // Top section with animated food items (dynamic sizing)
+             AnimatedContainer(
+               duration: Duration(milliseconds: _isKeyboardVisible ? 150 : 300),
+               curve: _isKeyboardVisible ? Curves.easeOut : Curves.easeInOut,
+               height: _isKeyboardVisible 
+                   ? MediaQuery.of(context).size.height * 0.15  // 15% when keyboard visible
+                   : MediaQuery.of(context).size.height * 0.5, // 50% when keyboard hidden
               child: Stack(
                 children: [
-                                     // Animated circles
+                                     // Animated circles - fixed positions
                    Positioned(
-                     top: 100,
+                     top: 60,
                      left: 50,
                      child: _AnimatedCircle(
                        color: Colors.blue.withValues(alpha: 0.15),
@@ -103,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 200,
+                     top: 120,
                      right: 80,
                      child: _AnimatedCircle(
                        color: Colors.orange.withValues(alpha: 0.1),
@@ -111,15 +157,15 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 150,
-                     left: 200,
+                     top: 90,
+                     left: 180,
                      child: _AnimatedCircle(
                        color: Colors.purple.withValues(alpha: 0.12),
                        controller: _circleController,
                      ),
                    ),
                    Positioned(
-                     top: 250,
+                     top: 150,
                      left: 100,
                      child: _AnimatedCircle(
                        color: Colors.green.withValues(alpha: 0.08),
@@ -127,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 180,
+                     top: 110,
                      right: 150,
                      child: _AnimatedCircle(
                        color: Colors.pink.withValues(alpha: 0.1),
@@ -135,15 +181,15 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 320,
-                     right: 30,
+                     top: 180,
+                     right: 40,
                      child: _AnimatedCircle(
                        color: Colors.yellow.withValues(alpha: 0.06),
                        controller: _circleController,
                      ),
                    ),
                    Positioned(
-                     top: 80,
+                     top: 70,
                      right: 200,
                      child: _AnimatedCircle(
                        color: Colors.teal.withValues(alpha: 0.09),
@@ -151,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 280,
+                     top: 140,
                      left: 250,
                      child: _AnimatedCircle(
                        color: Colors.indigo.withValues(alpha: 0.07),
@@ -159,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 120,
+                     top: 100,
                      left: 0,
                      right: 0,
                      child: Center(
@@ -170,10 +216,10 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                   
-                                     // Food items - First row
+                                     // Food items - Fixed positioning
                    Positioned(
                      top: 40,
-                     left: 30,
+                     left: 20,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Apple",
@@ -185,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen>
                    ),
                    Positioned(
                      top: 40,
-                     right: 30,
+                     right: 20,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Chicken",
@@ -198,8 +244,8 @@ class _LoginScreenState extends State<LoginScreen>
                    
                    // Second row
                    Positioned(
-                     top: 140,
-                     left: 100,
+                     top: 120,
+                     left: 80,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Bread",
@@ -210,8 +256,8 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 140,
-                     right: 100,
+                     top: 120,
+                     right: 80,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Milk",
@@ -224,8 +270,8 @@ class _LoginScreenState extends State<LoginScreen>
                    
                    // Third row
                    Positioned(
-                     top: 240,
-                     left: 50,
+                     top: 200,
+                     left: 40,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Eggs",
@@ -236,8 +282,8 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 240,
-                     right: 50,
+                     top: 200,
+                     right: 40,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Vegetables",
@@ -250,8 +296,8 @@ class _LoginScreenState extends State<LoginScreen>
                    
                    // Fourth row
                    Positioned(
-                     top: 340,
-                     left: 70,
+                     top: 280,
+                     left: 60,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Meat",
@@ -262,8 +308,8 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 340,
-                     right: 70,
+                     top: 280,
+                     right: 60,
                      child: _AnimatedFood(
                        food: _FoodData(
                          name: "Fresh Fish",
@@ -276,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen>
                    
                    // Additional food items to fill middle space
                    Positioned(
-                     top: 90,
+                     top: 80,
                      left: 0,
                      right: 0,
                      child: Center(
@@ -291,7 +337,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 190,
+                     top: 160,
                      left: 0,
                      right: 0,
                      child: Center(
@@ -306,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen>
                      ),
                    ),
                    Positioned(
-                     top: 290,
+                     top: 240,
                      left: 0,
                      right: 0,
                      child: Center(
@@ -335,6 +381,7 @@ class _LoginScreenState extends State<LoginScreen>
                    ),
                  ),
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   padding: const EdgeInsets.all(16.0),
                   child: Form(
                     key: _formKey,
@@ -391,6 +438,9 @@ class _LoginScreenState extends State<LoginScreen>
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -440,6 +490,9 @@ class _LoginScreenState extends State<LoginScreen>
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -549,7 +602,7 @@ class _LoginScreenState extends State<LoginScreen>
                           ),
                         ),
                         
-                                                 const SizedBox(height: 18), // Bottom padding for scroll safety
+                                                 const SizedBox(height: 100), // Extra bottom padding for keyboard
                       ],
                     ),
                   ),
@@ -611,7 +664,7 @@ class _AnimatedFood extends StatelessWidget {
       builder: (context, child) {
         return Transform.translate(
           offset: Offset(0, controller.value * 10),
-                      child: Container(
+          child: Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
@@ -627,8 +680,8 @@ class _AnimatedFood extends StatelessWidget {
                   food.emoji,
                   style: const TextStyle(fontSize: 32),
                 ),
-              ),
             ),
+          ),
         );
       },
     );

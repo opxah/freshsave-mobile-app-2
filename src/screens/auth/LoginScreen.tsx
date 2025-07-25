@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, Alert, Image, Dimensions, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -30,6 +30,7 @@ const LoginScreen: React.FC = () => {
   };
 
   const handleSignUp = () => {
+    console.log('Sign Up button pressed!');
     navigation.navigate('SignUp' as never);
   };
 
@@ -93,20 +94,30 @@ const LoginScreen: React.FC = () => {
             Sign In
           </Button>
           
+          <Button
+            mode="contained"
+            onPress={handleSignUp}
+            style={styles.signUpButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={styles.buttonLabel}
+          >
+            Sign Up
+          </Button>
+          
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>or</Text>
             <View style={styles.dividerLine} />
           </View>
           
-          <Button
-            mode="text"
-            onPress={handleSignUp}
-            style={styles.signUpButton}
-            labelStyle={styles.signUpLabel}
-          >
-            Create new account
-          </Button>
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUpText}>
+              You don't have an account yet?{' '}
+              <TouchableOpacity onPress={handleSignUp}>
+                <Text style={styles.signUpLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </Text>
+          </View>
         </View>
 
         {/* Footer */}
@@ -192,6 +203,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
+    marginBottom: 12,
+  },
+  signUpButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
   },
   buttonContent: {
     paddingVertical: 12,
@@ -217,14 +238,20 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '400',
   },
-  signUpButton: {
+  signUpContainer: {
+    alignItems: 'center',
     marginTop: 0,
   },
-  signUpLabel: {
-    fontSize: 16,
+  signUpText: {
+    fontSize: 15,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  signUpLink: {
     color: '#4CAF50',
     fontWeight: '600',
-    letterSpacing: 0.3,
+    textDecorationLine: 'underline',
   },
   footer: {
     alignItems: 'center',
