@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen>
     
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
         child: Column(

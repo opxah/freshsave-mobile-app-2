@@ -75,6 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen>
   }
 
   void _scrollToShowForm() {
+    print('TextFormField tapped - attempting to show keyboard');
     _handleKeyboardVisibility(true);
     
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -138,15 +139,17 @@ class _SignUpScreenState extends State<SignUpScreen>
     
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
+        top: false,
         child: Column(
           children: [
             // Top section with signup form (60% - increased to prevent overflow)
             Expanded(
               flex: 6,
               child: Container(
+                padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -160,13 +163,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                     FocusScope.of(context).unfocus();
                   },
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                     child: Form(
                       key: _formKey,
                       child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         
                         // Title
                         const Center(
@@ -181,11 +184,14 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 20),
                         
                         // Username Field
                         TextFormField(
                           controller: _usernameController,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -235,6 +241,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -284,6 +293,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
@@ -346,6 +358,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
+                          onTap: () {
+                            _scrollToShowForm();
+                          },
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.black,
