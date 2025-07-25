@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
+import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -418,14 +419,20 @@ class _LoginScreenState extends State<LoginScreen>
                             ),
                             GestureDetector(
                               onTap: () {
-                                // TODO: Navigate to sign up
+                                print('Sign Up clicked!'); // Debug print
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpScreen(),
+                                  ),
+                                );
                               },
                               child: const Text(
                                 "Sign Up",
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.green,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
                                 ),
                               ),
                             ),

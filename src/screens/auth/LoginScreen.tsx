@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert, Image, Dimensions, Pressable } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -31,6 +31,7 @@ const LoginScreen: React.FC = () => {
 
   const handleSignUp = () => {
     console.log('Sign Up button pressed!');
+    alert('Sign Up button clicked!'); // Add this to test if it's working
     navigation.navigate('SignUp' as never);
   };
 
@@ -94,16 +95,6 @@ const LoginScreen: React.FC = () => {
             Sign In
           </Button>
           
-          <Button
-            mode="contained"
-            onPress={handleSignUp}
-            style={styles.signUpButton}
-            contentStyle={styles.buttonContent}
-            labelStyle={styles.buttonLabel}
-          >
-            Sign Up
-          </Button>
-          
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
             <Text style={styles.dividerText}>or</Text>
@@ -112,11 +103,16 @@ const LoginScreen: React.FC = () => {
           
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>
-              You don't have an account yet?{' '}
-              <TouchableOpacity onPress={handleSignUp}>
-                <Text style={styles.signUpLink}>Sign Up</Text>
-              </TouchableOpacity>
+              You don't have an account yet?
             </Text>
+            <Button
+              mode="text"
+              onPress={handleSignUp}
+              style={styles.signUpButton}
+              labelStyle={styles.signUpButtonLabel}
+            >
+              Sign Up
+            </Button>
           </View>
         </View>
 
@@ -205,15 +201,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     marginBottom: 12,
   },
-  signUpButton: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 16,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
   buttonContent: {
     paddingVertical: 12,
   },
@@ -247,8 +234,13 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 22,
+    marginBottom: 8,
   },
-  signUpLink: {
+  signUpButton: {
+    marginTop: 0,
+  },
+  signUpButtonLabel: {
+    fontSize: 16,
     color: '#4CAF50',
     fontWeight: '600',
     textDecorationLine: 'underline',
