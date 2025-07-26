@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
+import '../services/auth_service.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -118,7 +119,11 @@ class _SignUpScreenState extends State<SignUpScreen>
           ),
         );
         
-        // Navigate to main screen
+        // For now, simulate customer login after signup
+        // In the future, this will create a real customer account
+        AuthService.login('user@freshsave.com', 'password123'); // Simulate customer login
+        
+        // Navigate to customer main screen
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
@@ -145,9 +150,9 @@ class _SignUpScreenState extends State<SignUpScreen>
         top: false,
         child: Column(
           children: [
-            // Top section with signup form (60% - increased to prevent overflow)
+            // Top section with signup form (55% - reduced to minimize white space)
             Expanded(
-              flex: 6,
+              flex: 5,
               child: Container(
                 padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                 decoration: const BoxDecoration(
@@ -184,7 +189,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         
                         // Username Field
                         TextFormField(
@@ -235,7 +240,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         
                         // Email Field
                         TextFormField(
@@ -287,7 +292,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         
                         // Password Field
                         TextFormField(
@@ -352,7 +357,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         
                         // Confirm Password Field
                         TextFormField(
@@ -417,7 +422,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           },
                         ),
                         
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         
                         // Create Account Button
                         SizedBox(
@@ -454,7 +459,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                           ),
                         ),
                         
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         
                         // Sign In link
                         Center(
@@ -490,9 +495,9 @@ class _SignUpScreenState extends State<SignUpScreen>
               ),
             ),
             
-            // Bottom section with food animations (40% - adjusted to balance with form)
+            // Bottom section with food animations (45% - increased to reduce white space)
             Expanded(
-              flex: 4,
+              flex: 5,
               child: Container(
                 decoration: const BoxDecoration(
                   color: Color(0xFF1A1A1A),

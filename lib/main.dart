@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
+import 'screens/admin_dashboard_screen.dart';
 import 'services/auth_service.dart';
 
 void main() {
@@ -36,7 +37,9 @@ class FreshSaveApp extends StatelessWidget {
           ),
         ),
       ),
-      home: AuthService.isLoggedIn ? const MainScreen() : const LoginScreen(),
+      home: AuthService.isLoggedIn 
+        ? (AuthService.isAdmin ? const AdminDashboardScreen() : const MainScreen())
+        : const LoginScreen(),
     );
   }
 }

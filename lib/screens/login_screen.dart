@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
+import '../services/auth_service.dart';
+import 'admin_dashboard_screen.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -97,6 +99,10 @@ class _LoginScreenState extends State<LoginScreen>
         _isLoading = true;
       });
 
+      // Get email and password from form
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
       // Simulate login process
       await Future.delayed(const Duration(seconds: 2));
 
@@ -104,9 +110,28 @@ class _LoginScreenState extends State<LoginScreen>
         setState(() {
           _isLoading = false;
         });
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-        );
+
+        // Attempt login using AuthService
+        if (AuthService.login(email, password)) {
+          // Login successful - navigate based on user role
+          if (AuthService.isAdmin) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+            );
+          } else if (AuthService.isCustomer) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const MainScreen()),
+            );
+          }
+        } else {
+          // Login failed
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Invalid email or password. Please try again.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
     }
   }

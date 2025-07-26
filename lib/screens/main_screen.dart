@@ -150,6 +150,8 @@ class MainScreen extends StatelessWidget {
                         _buildProductCard(context, 'Organic Bananas', '🍌', 4.99, 2.99, '2 days'),
                         _buildProductCard(context, 'Fresh Tomatoes', '🍅', 3.99, 1.99, '1 day'),
                         _buildProductCard(context, 'Greek Yogurt', '🥛', 5.99, 2.99, '3 days'),
+                        _buildProductCard(context, 'Organic Apples', '🍎', 3.49, 1.99, '4 days'),
+                        _buildProductCard(context, 'Fresh Spinach', '🥬', 4.99, 2.49, '2 days'),
                       ]),
                       
                       const SizedBox(height: 24),
@@ -158,6 +160,8 @@ class MainScreen extends StatelessWidget {
                         _buildProductCard(context, 'Artisan Bread', '🍞', 6.99, 3.99, 'Today'),
                         _buildProductCard(context, 'Croissants', '🥐', 4.99, 2.49, 'Today'),
                         _buildProductCard(context, 'Sourdough', '🥖', 7.99, 4.99, 'Tomorrow'),
+                        _buildProductCard(context, 'Chocolate Muffins', '🧁', 3.99, 1.99, 'Today'),
+                        _buildProductCard(context, 'Whole Grain Buns', '🥯', 5.99, 2.99, 'Tomorrow'),
                       ]),
                       
                       const SizedBox(height: 24),
@@ -166,6 +170,8 @@ class MainScreen extends StatelessWidget {
                         _buildProductCard(context, 'Fresh Milk', '🥛', 4.99, 2.99, '2 days'),
                         _buildProductCard(context, 'Cheddar Cheese', '🧀', 8.99, 5.99, '1 week'),
                         _buildProductCard(context, 'Butter', '🧈', 6.99, 3.99, '5 days'),
+                        _buildProductCard(context, 'Greek Yogurt', '🍶', 5.99, 2.99, '3 days'),
+                        _buildProductCard(context, 'Cottage Cheese', '🧀', 4.99, 2.49, '4 days'),
                       ]),
                       
                       const SizedBox(height: 24),
@@ -174,6 +180,8 @@ class MainScreen extends StatelessWidget {
                         _buildProductCard(context, 'Avocados', '🥑', 3.99, 1.99, '3 days'),
                         _buildProductCard(context, 'Spinach', '🥬', 4.99, 2.49, '2 days'),
                         _buildProductCard(context, 'Carrots', '🥕', 2.99, 1.49, '1 week'),
+                        _buildProductCard(context, 'Organic Kale', '🥬', 3.99, 1.99, '2 days'),
+                        _buildProductCard(context, 'Fresh Broccoli', '🥦', 4.49, 2.24, '3 days'),
                       ]),
                     ],
                   ),
@@ -672,15 +680,17 @@ class MainScreen extends StatelessWidget {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                // Navigate to sign in page and clear navigation stack
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
-                  (Route<dynamic> route) => false,
-                );
-              },
+                          ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Navigate to sign in page and clear navigation stack
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF4CAF50),
                 shape: RoundedRectangleBorder(
