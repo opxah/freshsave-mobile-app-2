@@ -8,8 +8,8 @@ class AdminInventoryScreen extends StatefulWidget {
 }
 
 class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
-  String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'Active', 'Expiring Soon', 'Drafts'];
+  String _selectedFilter = 'All Products';
+  final List<String> _filters = ['All Products', 'Active Discounts', 'Not Discounted'];
   
   // Mock data - in real app this would come from database
   final List<Map<String, dynamic>> _products = [
@@ -60,8 +60,14 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
   ];
 
   List<Map<String, dynamic>> get _filteredProducts {
-    if (_selectedFilter == 'All') return _products;
-    return _products.where((product) => product['status'] == _selectedFilter).toList();
+    if (_selectedFilter == 'All Products') return _products;
+    if (_selectedFilter == 'Active Discounts') {
+      return _products.where((product) => product['status'] == 'Active' || product['status'] == 'Expiring Soon').toList();
+    }
+    if (_selectedFilter == 'Not Discounted') {
+      return _products.where((product) => product['status'] == 'Draft').toList();
+    }
+    return _products;
   }
 
   void _showProductDetails(Map<String, dynamic> product) {
@@ -184,28 +190,6 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2C3E50),
-        elevation: 0,
-        title: const Text(
-          'Inventory Management',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            onPressed: _showBulkActions,
-          ),
-        ],
-      ),
       body: Column(
         children: [
           // Filter Bar
@@ -214,45 +198,35 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
             color: Colors.white,
             child: Column(
               children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Filter by:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                const Text(
+                  'Filter by:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _filters.map((filter) {
+                    final isSelected = _selectedFilter == filter;
+                    return FilterChip(
+                      label: Text(filter),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedFilter = filter;
+                        });
+                      },
+                      backgroundColor: Colors.grey.withOpacity(0.1),
+                      selectedColor: const Color(0xFF4CAF50).withOpacity(0.2),
+                      labelStyle: TextStyle(
+                        color: isSelected ? const Color(0xFF4CAF50) : Colors.black,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _filters.map((filter) {
-                            final isSelected = _selectedFilter == filter;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: FilterChip(
-                                label: Text(filter),
-                                selected: isSelected,
-                                onSelected: (selected) {
-                                  setState(() {
-                                    _selectedFilter = filter;
-                                  });
-                                },
-                                backgroundColor: Colors.grey.withOpacity(0.1),
-                                selectedColor: const Color(0xFF4CAF50).withOpacity(0.2),
-                                labelStyle: TextStyle(
-                                  color: isSelected ? const Color(0xFF4CAF50) : Colors.black,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 12),
                 Row(
