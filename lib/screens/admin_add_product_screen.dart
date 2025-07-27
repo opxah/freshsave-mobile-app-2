@@ -11,6 +11,8 @@ class AdminAddProductScreen extends StatefulWidget {
 
 class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
   int _currentStep = 0;
+  String _workflowType = '';
+  String _foodServiceTask = ''; // New: tracks the selected food service task
   String? _scannedBarcode;
   String? _productName;
   String? _productDescription;
@@ -91,6 +93,20 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
     );
   }
 
+  void _startFoodServiceWorkflow() {
+    setState(() {
+      _currentStep = 1;
+      _workflowType = 'food_service';
+    });
+  }
+
+  void _startSupermarketWorkflow() {
+    setState(() {
+      _currentStep = 1;
+      _workflowType = 'supermarket';
+    });
+  }
+
   void _showManualEntryForm() {
     setState(() {
       _currentStep = 1;
@@ -123,10 +139,25 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
   }
 
   void _previousStep() {
+    print('Back button pressed. Current step: $_currentStep');
     if (_currentStep > 0) {
       setState(() {
         _currentStep--;
+        print('Going back to step: $_currentStep');
+        // Reset workflow type if going back to step 0
+        if (_currentStep == 0) {
+          _workflowType = '';
+          _foodServiceTask = '';
+          print('Reset workflow type and task');
+        }
+        // Reset food service task if going back to step 1
+        if (_currentStep == 1 && _workflowType == 'food_service') {
+          _foodServiceTask = '';
+          print('Reset food service task');
+        }
       });
+    } else {
+      print('Cannot go back further');
     }
   }
 
@@ -151,25 +182,58 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
       backgroundColor: const Color(0xFFF8F9FA),
       body: Column(
         children: [
-          // Progress Indicator
+          // Progress Indicator with Back Button
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
-            child: Row(
+            child: Column(
               children: [
-                for (int i = 0; i < 4; i++)
-                  Expanded(
-                    child: Container(
-                      height: 4,
-                      margin: EdgeInsets.only(right: i < 3 ? 8 : 0),
-                      decoration: BoxDecoration(
-                        color: i <= _currentStep 
-                          ? const Color(0xFF4CAF50) 
-                          : Colors.grey.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(2),
+                // Back Button Row
+                Row(
+                  children: [
+                    if (_currentStep > 0) ...[
+                      GestureDetector(
+                        onTap: _previousStep,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.grey.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_rounded,
+                            size: 24,
+                            color: Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                    Expanded(
+                      child: Row(
+                        children: [
+                          for (int i = 0; i < (_workflowType == 'food_service' ? 5 : 4); i++)
+                            Expanded(
+                              child: Container(
+                                height: 4,
+                                margin: EdgeInsets.only(right: i < (_workflowType == 'food_service' ? 4 : 3) ? 8 : 0),
+                                decoration: BoxDecoration(
+                                  color: i <= _currentStep 
+                                    ? const Color(0xFF4CAF50) 
+                                    : Colors.grey.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -190,11 +254,13 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
       case 0:
         return _buildStep0();
       case 1:
-        return _buildStep1();
+        return _workflowType == 'food_service' ? _buildFoodServiceTaskSelection() : _buildStep1();
       case 2:
-        return _buildStep2();
+        return _workflowType == 'food_service' ? _buildFoodServiceStep1() : _buildStep2();
       case 3:
-        return _buildStep3();
+        return _workflowType == 'food_service' ? _buildFoodServiceStep2() : _buildStep3();
+      case 4:
+        return _workflowType == 'food_service' ? _buildFoodServiceStep3() : _buildStep0();
       default:
         return _buildStep0();
     }
@@ -205,7 +271,7 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'How would you like to add a product?',
+          'Choose Your Workflow',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -214,7 +280,7 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
         ),
         const SizedBox(height: 8),
         const Text(
-          'Choose the method that works best for your product',
+          'Select the workflow that best fits your business type',
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey,
@@ -222,38 +288,23 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
         ),
         const SizedBox(height: 32),
         
-        // Scan Barcode Option
-        _buildOptionCard(
-          'Scan Barcode',
-          'Scan the product barcode to auto-fill information',
-          Icons.qr_code_scanner_rounded,
+        // Food Service Workflow
+        _buildWorkflowCard(
+          'Food Service',
+          'Restaurants, cafes, and food vendors\n• Quick menu management\n• Same-day pickup items\n• Flexible pricing and availability',
+          Icons.restaurant_rounded,
           const Color(0xFF4CAF50),
-          () => _showScanner(),
+          () => _startFoodServiceWorkflow(),
         ),
         const SizedBox(height: 16),
         
-        // Manual Entry Option
-        _buildOptionCard(
-          'Manual Entry',
-          'Enter product information manually',
-          Icons.edit_rounded,
+        // Supermarket Workflow
+        _buildWorkflowCard(
+          'Supermarket',
+          'Grocery stores and retail\n• Barcode scanning\n• Inventory management\n• Expiration-based discounts',
+          Icons.store_rounded,
           const Color(0xFF2196F3),
-          () => _showManualEntryForm(),
-        ),
-        const SizedBox(height: 16),
-        
-        // Select from Database Option
-        _buildOptionCard(
-          'From Database',
-          'Select from your existing product catalog',
-          Icons.storage_rounded,
-          const Color(0xFF9C27B0),
-          () {
-            // TODO: Navigate to product database selection
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Product Database - Coming Soon!')),
-            );
-          },
+          () => _startSupermarketWorkflow(),
         ),
       ],
     );
@@ -792,7 +843,7 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
     );
   }
 
-  Widget _buildOptionCard(
+  Widget _buildTaskCard(
     String title,
     String description,
     IconData icon,
@@ -861,5 +912,711 @@ class _AdminAddProductScreenState extends State<AdminAddProductScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildWorkflowCard(
+    String title,
+    String description,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: color,
+              ),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Food Service Task Selection
+  Widget _buildFoodServiceTaskSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Select Task Type',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Choose how you want to add your food service item',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 32),
+        
+        // Add item from menu
+        _buildTaskCard(
+          'Add Item from Menu',
+          'Quickly add an existing menu item with current availability',
+          Icons.menu_book_rounded,
+          const Color(0xFF4CAF50),
+          () => _selectFoodServiceTask('from_menu'),
+        ),
+        const SizedBox(height: 16),
+        
+        // Add item manually
+        _buildTaskCard(
+          'Add Item Manually',
+          'Create a new item with custom details and pricing',
+          Icons.edit_rounded,
+          const Color(0xFF2196F3),
+          () => _selectFoodServiceTask('manual'),
+        ),
+        const SizedBox(height: 16),
+        
+        // Add item to menu
+        _buildTaskCard(
+          'Add Item to Menu',
+          'Save a new item to your menu for future use',
+          Icons.add_circle_outline_rounded,
+          const Color(0xFF9C27B0),
+          () => _selectFoodServiceTask('to_menu'),
+        ),
+      ],
+    );
+  }
+
+  void _selectFoodServiceTask(String task) {
+    setState(() {
+      _foodServiceTask = task;
+      _currentStep = 2;
+    });
+  }
+
+  // Food Service Workflow Steps
+  Widget _buildFoodServiceStep1() {
+    String title = '';
+    String subtitle = '';
+    
+    switch (_foodServiceTask) {
+      case 'from_menu':
+        title = 'Select from Menu';
+        subtitle = 'Choose an existing menu item to add';
+        break;
+      case 'manual':
+        title = 'Item Details';
+        subtitle = 'Enter details for your new item';
+        break;
+      case 'to_menu':
+        title = 'Menu Item Details';
+        subtitle = 'Create a new item for your menu';
+        break;
+      default:
+        title = 'Item Details';
+        subtitle = 'Enter details for your item';
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.grey,
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // Content based on task type
+        if (_foodServiceTask == 'from_menu') ...[
+          // Menu selection for "from_menu" task
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4CAF50).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your Menu Items',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF4CAF50),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildSampleMenuItem('Vegetarian Burrito'),
+                    _buildSampleMenuItem('Mini Pizza'),
+                    _buildSampleMenuItem('Caesar Salad'),
+                    _buildSampleMenuItem('Chicken Wrap'),
+                    _buildSampleMenuItem('Fruit Bowl'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ] else ...[
+          // Sample Menu Items for reference (for manual and to_menu tasks)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4CAF50).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF4CAF50).withOpacity(0.3)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Sample Menu Items',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF4CAF50),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildSampleMenuItem('Vegetarian Burrito'),
+                    _buildSampleMenuItem('Mini Pizza'),
+                    _buildSampleMenuItem('Caesar Salad'),
+                    _buildSampleMenuItem('Chicken Wrap'),
+                    _buildSampleMenuItem('Fruit Bowl'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+        
+        if (_foodServiceTask == 'from_menu') ...[
+          // Simple form for "from_menu" task
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withOpacity(0.3)),
+            ),
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Available Quantity *',
+                    border: OutlineInputBorder(),
+                    hintText: '10',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter available quantity';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          // Full form for "manual" and "to_menu" tasks
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Item Name *',
+                    border: OutlineInputBorder(),
+                    hintText: 'e.g., Vegetarian Burrito',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an item name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                TextFormField(
+                  controller: _descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                    hintText: 'e.g., Fresh vegetables with rice and beans',
+                  ),
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 16),
+                
+                TextFormField(
+                  controller: _originalPriceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Price *',
+                    border: OutlineInputBorder(),
+                    prefixText: '\$',
+                    hintText: '8.99',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a price';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid price';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Available Quantity *',
+                    border: OutlineInputBorder(),
+                    hintText: '10',
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter available quantity';
+                    }
+                    if (int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+        
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _nextStep,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF4CAF50),
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            child: Text(
+              _foodServiceTask == 'from_menu' ? 'Next: Pickup Time' : 'Next: Pickup Time',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFoodServiceStep2() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Pickup Time & Availability',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // Pickup Time Window
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Available Until',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now().replacing(hour: TimeOfDay.now().hour + 2),
+                  );
+                  if (time != null) {
+                    setState(() {
+                      _scheduleTime = time;
+                    });
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.access_time, color: Colors.grey),
+                      const SizedBox(width: 8),
+                      Text(
+                        _scheduleTime != null 
+                          ? _scheduleTime!.format(context)
+                          : 'Select time (e.g., 8:00 PM)',
+                        style: TextStyle(
+                          color: _scheduleTime != null ? Colors.black : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        // Tags
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Tags (Optional)',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildTagChip('Vegetarian', false),
+                  _buildTagChip('Spicy', false),
+                  _buildTagChip('Contains Nuts', false),
+                  _buildTagChip('Gluten Free', false),
+                  _buildTagChip('Dairy Free', false),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _previousStep,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Back'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _nextStep,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4CAF50),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text(
+                  'Next: Photo & Publish',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFoodServiceStep3() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Photo & Publish',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C3E50),
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        // Photo Upload
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Item Photo',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () {
+                  // TODO: Implement image picker
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Photo upload - Coming Soon!')),
+                  );
+                },
+                child: Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.withOpacity(0.5), style: BorderStyle.solid),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.withOpacity(0.1),
+                  ),
+                  child: const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
+                      SizedBox(height: 8),
+                      Text('Add Photo', style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        // Save to Menu
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+          ),
+          child: Row(
+            children: [
+              Checkbox(
+                value: _isDraft,
+                onChanged: (value) {
+                  setState(() {
+                    _isDraft = value!;
+                  });
+                },
+              ),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Save to menu for future use',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'This item will be available in your menu for quick adding',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _previousStep,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Back'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _submitFoodServiceProduct,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4CAF50),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: Text(
+                  _isDraft ? 'Save to Menu' : 'Publish Item',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSampleMenuItem(String name) {
+    return GestureDetector(
+      onTap: () {
+        _nameController.text = name;
+        setState(() {});
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFF4CAF50)),
+        ),
+        child: Text(
+          name,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Color(0xFF4CAF50),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTagChip(String tag, bool isSelected) {
+    return FilterChip(
+      label: Text(tag),
+      selected: isSelected,
+      onSelected: (selected) {
+        // TODO: Implement tag selection
+      },
+      selectedColor: const Color(0xFF4CAF50).withOpacity(0.2),
+      checkmarkColor: const Color(0xFF4CAF50),
+    );
+  }
+
+  void _submitFoodServiceProduct() {
+    if (_formKey.currentState!.validate()) {
+      // TODO: Save to local database (session-only for MVP)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Food service item added successfully!'),
+          backgroundColor: Color(0xFF4CAF50),
+        ),
+      );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+      );
+    }
   }
 } 

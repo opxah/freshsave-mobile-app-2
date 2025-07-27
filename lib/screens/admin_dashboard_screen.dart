@@ -34,10 +34,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       backgroundColor: const Color(0xFFF8F9FA),
       body: Column(
         children: [
-          // Custom Header (10% of screen) - matches customer app exactly
+          // Custom Header - matches customer app exactly
           Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            height: MediaQuery.of(context).padding.top + 90, // Reduced by 25% from 120 to 90
+            padding: EdgeInsets.only(
+              left: 20.0,
+              right: 20.0,
+              top: MediaQuery.of(context).padding.top + 8.0,
+              bottom: 8.0,
+            ),
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -60,21 +65,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       });
                     }
                   },
-                  child: Image.asset(
-                    'assets/images/freshsave_logo.png',
+                  child: SizedBox(
                     height: 100,
                     width: 100,
-                    fit: BoxFit.contain,
+                    child: Image.asset(
+                      'assets/images/freshsave_logo.png',
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 
                 // User email on the right (instead of profile icon)
-                Text(
-                  AuthService.currentUser ?? 'Unknown',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Text(
+                    AuthService.currentUser ?? 'Unknown',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
               ],
@@ -87,6 +99,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           // Footer (same style as customer app)
           Container(
             height: 80,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -98,37 +111,46 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildNavItem(
-                  icon: Icons.home_outlined,
-                  label: 'Home',
-                  isSelected: _selectedIndex == 0,
-                  onTap: () => _onNavTap(0),
+                Expanded(
+                  child: _buildNavItem(
+                    icon: Icons.home_outlined,
+                    label: 'Home',
+                    isSelected: _selectedIndex == 0,
+                    onTap: () => _onNavTap(0),
+                  ),
                 ),
-                _buildNavItem(
-                  icon: Icons.add_box_outlined,
-                  label: 'Add Product',
-                  isSelected: _selectedIndex == 1,
-                  onTap: () => _onNavTap(1),
+                Expanded(
+                  child: _buildNavItem(
+                    icon: Icons.add_box_outlined,
+                    label: 'Add Product',
+                    isSelected: _selectedIndex == 1,
+                    onTap: () => _onNavTap(1),
+                  ),
                 ),
-                _buildNavItem(
-                  icon: Icons.inventory_2_outlined,
-                  label: 'Inventory',
-                  isSelected: _selectedIndex == 2,
-                  onTap: () => _onNavTap(2),
+                Expanded(
+                  child: _buildNavItem(
+                    icon: Icons.inventory_2_outlined,
+                    label: 'Inventory',
+                    isSelected: _selectedIndex == 2,
+                    onTap: () => _onNavTap(2),
+                  ),
                 ),
-                _buildNavItem(
-                  icon: Icons.analytics_outlined,
-                  label: 'Analytics',
-                  isSelected: _selectedIndex == 3,
-                  onTap: () => _onNavTap(3),
+                Expanded(
+                  child: _buildNavItem(
+                    icon: Icons.analytics_outlined,
+                    label: 'Analytics',
+                    isSelected: _selectedIndex == 3,
+                    onTap: () => _onNavTap(3),
+                  ),
                 ),
-                _buildNavItem(
-                  icon: Icons.settings_outlined,
-                  label: 'Settings',
-                  isSelected: _selectedIndex == 4,
-                  onTap: () => _onNavTap(4),
+                Expanded(
+                  child: _buildNavItem(
+                    icon: Icons.settings_outlined,
+                    label: 'Settings',
+                    isSelected: _selectedIndex == 4,
+                    onTap: () => _onNavTap(4),
+                  ),
                 ),
               ],
             ),
@@ -149,7 +171,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       child: Opacity(
         opacity: 1.0,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

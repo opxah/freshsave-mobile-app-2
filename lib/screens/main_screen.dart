@@ -11,13 +11,18 @@ class MainScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF1A1A1A),
       body: SafeArea(
-        bottom: false,
+        top: false,
         child: Column(
           children: [
             // Custom Header (10% of screen)
             Container(
               height: MediaQuery.of(context).size.height * 0.1,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+              padding: EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: MediaQuery.of(context).padding.top + 8.0,
+                bottom: 8.0,
+              ),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
